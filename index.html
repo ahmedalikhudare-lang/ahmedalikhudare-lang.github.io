@@ -676,6 +676,13 @@ input[type="range"]{width:100%;accent-color:var(--accent);padding:0;border:0;bac
 .spin-dots i:nth-child(2){animation-delay:.16s}.spin-dots i:nth-child(3){animation-delay:.32s}
 
 /* ---------- Qudurat timer ---------- */
+.qfocus{text-align:center}
+.qf-time{font-size:64px;font-weight:900;color:var(--accent);line-height:1.1;margin:4px 0 2px}
+.qf-sub{color:var(--muted);font-size:14px;margin-bottom:14px}
+.qfocus .kpi{text-align:start}
+.focus-ov.full .seg,.focus-ov.full .fo-subs,.focus-ov.full .fo-durs{display:none}
+.focus-ov.full .fo-ring{width:min(300px,78vw);margin:22px auto 14px}
+.focus-ov.full .fo-t b{font-size:68px}
 .qt-q{display:flex;justify-content:center;align-items:baseline;gap:10px;font-size:13.5px;opacity:.9}
 .qt-q b{font-size:24px;font-weight:900}
 #qt-pace{text-align:center;font-size:13.5px;font-weight:700;margin-top:-6px}
@@ -1100,7 +1107,7 @@ const TDEF={phase:'focus',track:'study',sub:'quant',dur:25,focusDur:25,endAt:nul
 let T=(()=>{try{return Object.assign({...TDEF},JSON.parse(lsGet(LS.timer)||'{}'))}catch(e){return{...TDEF}}})();
 const saveT=()=>lsSet(LS.timer,JSON.stringify(T));
 const tLeft=()=>T.running?Math.max(0,T.endAt-Date.now()):T.left;
-function focusSubs(tr){if(tr==='study')return[['quant','كمّي'],['verbal','لفظي'],...S.subjects.map(s=>[s.id,s.name])];if(tr==='quran')return[['hifz','حفظ'],['rev','مراجعة']];if(tr==='lang')return S.langs.map(l=>[l.id,l.name]);if(tr==='skills')return S.skills.map(s=>[s.id,s.name]);return[]}
+function focusSubs(tr){if(tr==='study')return[['qud','قدرات'],['quant','كمّي'],['verbal','لفظي'],...S.subjects.map(s=>[s.id,s.name])];if(tr==='quran')return[['hifz','حفظ'],['rev','مراجعة']];if(tr==='lang')return S.langs.map(l=>[l.id,l.name]);if(tr==='skills')return S.skills.map(s=>[s.id,s.name]);return[]}
 const subLabel=(tr,sub)=>{const f=focusSubs(tr).find(x=>x[0]===sub);return f?f[1]:TR[tr].n};
 function tStart(){unlockAudio();if(T.running)return;if(T.left<=0)T.left=T.dur*60000;T.endAt=Date.now()+T.left;T.running=true;saveT();wake(true);renderFocus();renderMini()}
 function tPause(){if(!T.running)return;T.left=tLeft();T.running=false;T.endAt=null;saveT();wake(false);renderFocus();renderMini()}
@@ -1111,17 +1118,17 @@ function credit(m){const k=today(),tr=T.track,sub=T.sub;commit(()=>{const d=day(
   S.sessions.unshift({id:uid(),d:k,t:Date.now(),min:m,track:tr,sub})})}
 function tFinish(){if(T.phase==='focus'){const done=Math.floor((T.dur*60000-tLeft())/60000);if(done>=1){credit(done);toast(`سجّلنا ${done} دقيقة · +${done} نقطة`)}else toast('أقل من دقيقة، ما انحسبت')}T.phase='focus';T.dur=T.focusDur||25;tReset()}
 function tCheck(){if(!(T.running&&Date.now()>=T.endAt))return;T.running=false;T.endAt=null;wake(false);
-  if(T.phase==='focus'){const m=T.dur;T.focusDur=T.dur;T.phase='break';T.dur=T.dur>=45?10:5;T.left=T.dur*60000;saveT();credit(m);chime();buzz();confetti();toast(`جلسة ${m} دقيقة خلصت! خذ استراحة ${T.dur} د`,true)}
+  if(T.phase==='focus'){const m=T.dur;T.focusDur=T.dur;T.phase='break';T.dur=5;T.left=T.dur*60000;T.endAt=Date.now()+T.left;T.running=true;saveT();wake(true);credit(m);chime();buzz();confetti();toast(`خلصت ${m} دقيقة تركيز! بدأت استراحة 5 دقائق`,true)}
   else{T.phase='focus';T.dur=T.focusDur||25;T.left=T.dur*60000;saveT();chime();buzz();toast('خلصت الاستراحة، يلا نرجع للتركيز',true)}
   renderFocus();renderMini()}
-function openFocus(track,sub,dur,autostart){if(track&&!T.running){T.track=track;T.sub=sub!=null?sub:((focusSubs(track)[0]||[''])[0]);if(dur){T.phase='focus';T.dur=T.focusDur=dur;T.left=dur*60000}saveT()}
+function openFocus(track,sub,dur,autostart,full){if(!T.running){T.full=!!full;saveT()}if(track&&!T.running){T.track=track;T.sub=sub!=null?sub:((focusSubs(track)[0]||[''])[0]);if(dur){T.phase='focus';T.dur=T.focusDur=dur;T.left=dur*60000}saveT()}
   $('#focus').hidden=false;document.body.style.overflow='hidden';renderFocus();if(autostart)tStart()}
 function closeFocus(){$('#focus').hidden=true;document.body.style.overflow='';renderMini()}
-function renderFocus(){if($('#focus').hidden)return;const el=$('#focus-in');el.innerHTML=focusHTML();arabize(el)}
+function renderFocus(){if($('#focus').hidden)return;$('#focus').classList.toggle('full',!!T.full);const el=$('#focus-in');el.innerHTML=focusHTML();arabize(el)}
 function focusHTML(){
   const L=tLeft(),tot=T.dur*60000,RC=2*Math.PI*120,subs=focusSubs(T.track),td=today(),dm=(S.days[td]||{}).min||0,sess=S.sessions.filter(s=>s.d===td).slice(0,5),paused=!T.running&&L<tot&&L>0;
   const line=T.phase==='break'?'استراحة مستحقة. قوم تمشّى شوي واشرب موية.':T.running?'ركّز، الجوال بعيد عنك.':MOTTO;
-  return `<div class="fo-top"><button class="hb" data-act="focus-min" aria-label="تصغير">${icon('min')}</button><b>جلسة تركيز</b><small class="num">اليوم ${fmtDur(dm)}</small></div>
+  return `<div class="fo-top"><button class="hb" data-act="focus-min" aria-label="تصغير">${icon('min')}</button><b>${T.full?'تركيز تام · قدرات':'جلسة تركيز'}</b><small class="num">اليوم ${fmtDur(dm)}</small></div>
   <div class="seg" role="group" aria-label="القسم">${FOCUS_TR.map(t=>`<button data-act="t-track" data-v="${t}" aria-pressed="${T.track===t}" ${T.running?'disabled':''}>${TR[t].n}</button>`).join('')}</div>
   ${subs.length?`<div class="fo-subs">${subs.map(([v,l])=>`<button data-act="t-sub" data-v="${esc(v)}" aria-pressed="${T.sub===v}">${esc(l)}</button>`).join('')}</div>`:''}
   <div class="fo-ring ${T.phase}"><svg viewBox="0 0 260 260"><circle class="trk" cx="130" cy="130" r="120"/><circle id="fo-prg" class="prg" cx="130" cy="130" r="120" stroke-dasharray="${RC.toFixed(1)}" stroke-dashoffset="${(RC*L/tot).toFixed(1)}"/></svg><div class="fo-t"><b id="fo-time">${mmss(L)}</b><small>${T.phase==='focus'?'تركيز · '+esc(subLabel(T.track,T.sub)):'استراحة'}</small></div></div>
@@ -1567,8 +1574,9 @@ const ACT={
   'qt-next':()=>qtNext(),'qt-pause':()=>qtPause(),'qt-resume':()=>qtResume(),'qt-end':()=>qtFinish('done'),'qt-open':()=>openQT(),
   'qt-quit':el=>{if(!armed(el,'متأكد؟'))return;QT.active=false;QT.running=false;saveQT();wake(false);closeQT();render();toast('طلعت بدون تسجيل')},
   'qt-skip':()=>{if(qtRes){const m=Math.floor(qtRes.used/60000);if(m>=1)commit(()=>qtCredit(m,today(),'quant'))}qtRes=null;closeSheet()},
-  'qt-quick':el=>{if(QT.active){openQT();return}const D=planDay(el.dataset.k),it=D&&D.items[+el.dataset.i];if(!it||!it.res)return;let x=it.from;for(let j=it.from;j<=it.to;j++)if(!resDone(it.res,j)){x=j;break}qtStart({mode:'section',r:it.res,i:x,n:qtDefN(it.res),per:qtDefPer(it.res)})},
+  'qt-quick':()=>{if(T.running){openFocus();return}openFocus('study','qud',45,true,true)},
   'study-focus':()=>openFocus('study','quant'),
+  qfocus:()=>openFocus('study','qud',45,true,true),
   'fam-exit':()=>{famLink=false;FAM=FAM0;viewMode='app';try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}render({enter:true,dir:'back'});window.scrollTo(0,0)},
   install:()=>doInstall(),
   'install-hide':()=>{lsSet('darb.installHide','1');render()},
@@ -1792,19 +1800,11 @@ function qtResultSheet(){const r=qtRes;if(!r)return;const R=QRES[r.r]||{};
   else openSheet(`${head(r.reason==='time'?'خلص وقت الاختبار':'خلّصت الاختبار')}<div class="mini-stats"><div><b class="num">${fmtDur(r.used/60000)}</b><small>الوقت</small></div><div><b class="num">${fmtDur(r.dur)}</b><small>المدة</small></div><div><b class="num">${Math.round(r.used/(r.dur*600))}%</b><small>من الوقت</small></div></div>
     <form data-form="qtsave">${fld('درجتك من 100',`<input id="f-qs" type="number" name="score" min="0" max="100" required inputmode="numeric">`,'f-qs')}${actions('<button class="btn ghost" type="button" data-act="qt-skip">بدون تسجيل</button>','سجّل الدرجة · +30')}</form>`)}
 function qtSum(f){const o=f.querySelector('#qt-sum');if(!o)return;const n=+f.elements.n.value||0,pc=f.querySelector('input[name=per]:checked'),per=pc?+pc.value:60;o.textContent=ad(`المجموع ${fmtDur(n*per/60)} · ${n} سؤال`)}
-function studyTimer(){const td=today(),P=planDay(td);let r=QT.r||'mufakkir',i;
-  if(P){const it=P.items.find(it=>{if(!it.res)return false;for(let x=it.from;x<=it.to;x++)if(!resDone(it.res,x))return true;return false});if(it){r=it.res;for(let x=it.from;x<=it.to;x++)if(!resDone(it.res,x)){i=x;break}}}
-  if(!i)i=qtNextSec(r);const n=qtDefN(r),per=qtDefPer(r),timed=S.qscores.filter(s=>s.s).slice(0,5);
-  const sectionForm=`<form data-form="qtstart" data-mode="section">${fld('المصدر',opts('r',QRES_KEYS.map(k=>[k,QRES[k].n,'t-'+QRES[k].sec]),r))}
-    <div class="row2">${fld('رقم القسم',`<input id="f-qi" type="number" name="i" min="1" max="400" inputmode="numeric" value="${i}">`,'f-qi')}${fld('عدد الأسئلة',`<input id="f-qn" type="number" name="n" min="1" max="100" inputmode="numeric" value="${n}">`,'f-qn')}</div>
-    ${fld('الوقت لكل سؤال',opts('per',[[30,'30 ث'],[45,'45 ث'],[60,'60 ث'],[75,'75 ث'],[90,'90 ث']],per))}
-    <p class="hint" id="qt-sum" style="margin:-4px 0 12px">المجموع ${fmtDur(n*per/60)} · ${n} سؤال</p><button class="btn primary qt-go" type="submit">${icon('timer')} ابدأ القسم</button></form>`;
-  const mockForm=`<form data-form="qtstart" data-mode="mock">${fld('مدة الاختبار',opts('dur',[[60,'ساعة'],[90,'ساعة ونص'],[120,'ساعتين']],QT.dur||120))}<p class="hint" style="margin:-4px 0 12px">حلّه مرة وحدة بدون توقف وبنفس ظروف الاختبار، وفي النهاية سجّل درجتك.</p><button class="btn primary qt-go" type="submit">${icon('flag')} ابدأ الاختبار</button></form>`;
-  const focusPart=`<p class="hint" style="margin:0 0 12px">جلسة مذاكرة عادية: 25 أو 45 دقيقة تركيز وبعدها استراحة. مناسبة لشرح دروس المعاصر.</p><button class="btn primary qt-go" data-act="study-focus">${icon('play')} افتح مؤقت التركيز</button>`;
-  return `${QT.active?`<button class="night-note" data-act="qt-open" style="margin:0 0 12px">${icon('timer')}<span>عندك مؤقت شغّال</span><b>ارجع له</b></button>`:''}
-  <div class="card"><div class="c-head"><h2>مؤقت القدرات</h2><small>يحسب وقتك كأنك في الاختبار</small></div>${seg('qtMode',[['section','قسم'],['mock','اختبار محاكي'],['focus','مذاكرة']])}
-  <div style="margin-top:14px">${ui.qtMode==='mock'?mockForm:ui.qtMode==='focus'?focusPart:sectionForm}</div></div>
-  ${timed.length?`<h3 class="sec-t">آخر أقسام بالمؤقت</h3><div class="card"><ul class="rows">${timed.map(s=>`<li><span class="r-main"><b>${esc(QRES[s.r]?QRES[s.r].n:'')} · ${QRES[s.r]?QRES[s.r].unit:''} ${s.i}</b><small class="num">${s.c}/${s.n} صح · ${Math.round(s.s/s.n)} ث للسؤال · ${esc(ago(s.d))}</small></span></li>`).join('')}</ul></div>`:''}`}
+function studyTimer(){const td=today(),ss=S.sessions.filter(s=>s.d===td&&s.track==='study'),mins=sum(ss,s=>s.min),rounds=ss.filter(s=>s.min>=40).length;
+  return `<div class="card qfocus"><p class="kick">وقت التركيز التام</p><div class="qf-time num">45:00</div><p class="qf-sub">45 دقيقة تركيز، وبعدها 5 دقائق راحة. وأنت تدبّر مذاكرتك.</p>
+  ${T.running?`<button class="btn primary qt-go" data-act="focus-open">${icon('timer')} المؤقت شغّال، ارجع له</button>`:`<button class="btn primary qt-go" data-act="qfocus">${icon('play')} ابدأ 45 دقيقة</button>`}
+  <div class="kpis3" style="margin-top:14px"><div class="kpi ac"><small>جولات اليوم</small><b class="num">${rounds}</b></div><div class="kpi"><small>مذاكرة اليوم</small><b class="num" style="font-size:19px">${fmtDur(mins)}</b></div><div class="kpi ok"><small>هدفك اليومي</small><b class="num" style="font-size:19px">${fmtDur(+S.profile.goal||60)}</b></div></div></div>
+  <p class="hint">تقدر تشغّله بعد من زر المؤقت على مهمة القدرات في صفحة «اليوم».</p>`}
 
 /* ================= init ================= */
 (function init(){
