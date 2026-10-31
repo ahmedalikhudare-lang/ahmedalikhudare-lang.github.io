@@ -325,6 +325,9 @@ input,select,textarea{font:inherit;font-size:16px;color:var(--ink)}
 .pl-day.today .pl-n{background:var(--accent);color:var(--accent-ink)}
 .pl-day.miss .pl-s{background:var(--danger-soft);color:var(--danger)}
 .pl-day.part .pl-s{color:var(--warn)}
+.pl-day.rest{opacity:.65;box-shadow:inset 0 0 0 1px var(--line);background:transparent}
+.pl-day.rest .pl-n{background:transparent;border:1.5px dashed var(--faint)}
+.units .pl-g{list-style:none;margin:12px 0 2px}
 .pl-day.ph-exam .pl-n{background:var(--ink);color:var(--bg)}
 .grp{font-size:19px;font-weight:900;margin:20px 2px 10px}
 .qmap{padding:14px 14px 8px;border-radius:22px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);margin-bottom:12px}
@@ -806,7 +809,12 @@ const SLOGAN='<p class="slogan"><span>يا سلام على الإنسانية، 
 const MOTTO='لن يحقق حلمك أحدٌ غيرك';
 const ENC=['كفو يا {n}!','وحدة ورا الثانية، كمّل','هذا هو!','زين زين، استمر','الله يعطيك العافية','أبدعت يا {n}','قرّبت تقفل يومك','الدرب يبيله ناس مثلك'];
 const POEM=[['أتظنُّ أنَّ المجدَ يأتي فجأةً؟','مَن جدَّ يلقى، والمزارعُ يحصدُ',0],['انهضْ، فدربُ العزِّ صعبٌ شائقٌ','هل حقّقَ الأحلامَ شخصٌ يرقدُ؟',1],['لا بدَّ تشقى، والعناءُ تذوقُه','إنْ كنتَ للعلياءِ حقًّا تنشدُ',0],['ودعِ التثبّطَ والمخذّلَ لا تُصغِ','إنَّ الفعالَ على الرجالِ لتشهدُ',1]];
-const PH={found:'تأسيس كمّي',train:'تدريب كمّي ولفظي',review:'المراجعة الأخيرة',exam:'يوم الاختبار'};
+/* Foundation schedule "جدول منجز 1" (منصة تقدر · المعاصر 11): one entry per calendar day from the plan start; rest = Friday off.
+   seg = [bab, lesson no, name, part, pages, videos, seconds of video] */
+const MZ_BABS=['الباب زيرو','الباب الأول','الباب الثاني','الباب الثالث','الباب الرابع'];
+const MANJAZ=[{"segs":[[0,2,"أسرع الطرق لحل سؤال القدرات","كامل","ص 3–11",9,9482]]},{"segs":[[0,3,"جمع وطرح وضرب وقسمة الأعداد الكبيرة","كامل","ص 12–18",7,7215],[0,4,"الإحصاء والاحتمالات","البداية","ص 19–21",3,3270]]},{"segs":[[0,4,"الإحصاء والاحتمالات","الباقي","ص 22–24",3,3831],[0,5,"قابلية القسمة","كامل","ص 25–30",6,6098]]},{"segs":[[1,1,"الأعداد العشرية","كامل","ص 32–38",7,5673],[1,2,"الكسور","البداية","ص 39–42",5,4410]]},{"segs":[[1,2,"الكسور","الباقي","ص 43–46",4,4289],[1,3,"الجذور","البداية","ص 47–54",8,6169]]},{"rest":1},{"segs":[[1,3,"الجذور","الباقي","ص 55–56",2,1292],[1,4,"الأسس","كامل","ص 57–67",11,8721]]},{"segs":[[1,5,"المسافة والسرعة والزمن","كامل","ص 68–72",5,5834],[2,1,"النسبة والنسبة المئوية","كامل","ص 74–80",7,4709]]},{"segs":[[2,2,"التناسب الطردي والعكسي","كامل","ص 81–86",6,4909],[2,3,"الربح والخسارة والسعر الأصلي","كامل","ص 87–91",5,4722],[2,4,"الوسط الحسابي","البداية","ص 92–93",2,1958]]},{"segs":[[2,4,"الوسط الحسابي","الباقي","ص 94–96",3,2120],[3,1,"الزوايا والمضلعات","كامل","ص 98–108",11,7122],[3,2,"المثلث القائم","البداية","ص 109–110",2,1900]]},{"segs":[[3,2,"المثلث القائم","الباقي","ص 111–118",8,6271],[3,3,"المستطيل","كامل","ص 119–124",6,4857]]},{"segs":[[3,4,"المربع","كامل","ص 125–130",6,3538],[3,5,"المتوازي والمعين وشبه المنحرف","كامل","ص 131–136",6,4384],[3,6,"الدائرة","البداية","ص 137–140",4,3118]]},{"rest":1},{"segs":[[3,6,"الدائرة","الباقي","ص 141–147",7,4729],[3,7,"التوازي","كامل","ص 148–152",5,3016],[3,8,"الأشكال ثلاثية الأبعاد","كامل","ص 153–157",5,3355]]},{"segs":[[4,1,"الدوريات والأنماط","كامل","ص 159–163",5,7166],[4,2,"المربعات الكاملة والفرق بين مربعين","البداية","ص 163–166",4,3968]]},{"segs":[[4,2,"المربعات الكاملة والفرق بين مربعين","الباقي","ص 167–168",2,3137],[4,3,"قوانين ومتفرقات","كامل","ص 168–171 + فيديو النوادر",5,7986]]}];
+const MZ_SEGS=[];MANJAZ.forEach((d,di)=>{(d.segs||[]).forEach(s=>MZ_SEGS.push({di,b:s[0],no:s[1],name:s[2],part:s[3],pages:s[4],v:s[5],sec:s[6]}))});
+const PH={rest:'راحة',found:'تأسيس كمّي',train:'تدريب كمّي ولفظي',review:'المراجعة الأخيرة',exam:'يوم الاختبار'};
 
 const ICON={
 home:'<path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/>',
@@ -854,8 +862,8 @@ const EMBLEM='<svg class="emb" viewBox="0 0 120 120" aria-hidden="true"><circle 
 
 /* ================= state ================= */
 const LS={qt:'darb.qt.v1',splash:'darb.splash.v1',state:'darb.state.v1',synced:'darb.synced.v1',timer:'darb.timer.v1',ui:'darb.ui.v2',mode:'darb.mode.v1'};
-const DEF_PROFILE={name:'خضري',goal:150,examDate:'2026-12-17',target:90};
-const DEF_QPLAN={start:'2026-11-01',foundDays:30,res:{moaser:25,mufakkir:90,red:90,ehab:70,freq:20},names:[]};
+const DEF_PROFILE={name:'خضري',goal:180,examDate:'2026-12-17',target:90};
+const DEF_QPLAN={start:'2026-11-01',found:'manjaz',foundDays:16,res:{moaser:31,mufakkir:90,red:90,ehab:70,freq:20},names:[]};
 function blank(){return{v:4,since:today(),updatedAt:0,starter:false,noteSeen:false,profile:{...DEF_PROFILE},xp:0,spent:0,best:0,lvSeen:1,
   tasks:[],schedule:[],events:[],rewards:[],redeemed:[],done:{},skip:{},days:{},sessions:[],
   qplan:JSON.parse(JSON.stringify(DEF_QPLAN)),qprog:{},qdone:{},qscores:[],mocks:[],subjects:[],
@@ -872,7 +880,7 @@ function starter(){
   s.books=[{id:uid(),title:'Atomic Habits',author:'James Clear',lang:en.id,pages:320,read:0,status:'reading',start:today(),end:null}];
   s.words=[['consistent','مستمر، منتظم'],['achieve','يحقق'],['focus','يركّز'],['improve','يحسّن'],['goal','هدف']].map(([w,m])=>({id:uid(),w,m,lang:en.id,d:today(),box:0}));
   s.skills=[{id:uid(),name:'البرمجة',target:40,min:0,steps:['أساسيات بايثون','أول مشروع صغير','أرفع مشروعي على GitHub'].map(t=>({id:uid(),t,done:false}))},{id:uid(),name:'الإلقاء والتقديم',target:15,min:0,steps:['أسجّل نفسي دقيقتين أتكلم','أقدّم عرض قدام أهلي'].map(t=>({id:uid(),t,done:false}))}];
-  s.goals=[{id:uid(),title:'أخلص تأسيس المعاصر 11',track:'study',metric:'moaser',target:25,due:'2026-11-30'},{id:uid(),title:'أوصل 90 في اختبار محاكي',track:'study',metric:'mockBest',target:90,due:'2026-12-16'},{id:uid(),title:'أحفظ جزء عمّ',track:'quran',metric:'juz30',target:100,due:''},{id:uid(),title:'أخلص كتابين قبل نهاية السنة',track:'lang',metric:'booksDone',target:2,due:'2026-12-31'},{id:uid(),title:'10 مشاوير رياضة',track:'personal',metric:'manual',target:10,unit:'مرة',progress:0,due:''}];
+  s.goals=[{id:uid(),title:'أخلص تأسيس المعاصر 11 (منجز 1)',track:'study',metric:'moaser',target:MZ_SEGS.length,due:'2026-11-16'},{id:uid(),title:'أوصل 90 في اختبار محاكي',track:'study',metric:'mockBest',target:90,due:'2026-12-16'},{id:uid(),title:'أحفظ جزء عمّ',track:'quran',metric:'juz30',target:100,due:''},{id:uid(),title:'أخلص كتابين قبل نهاية السنة',track:'lang',metric:'booksDone',target:2,due:'2026-12-31'},{id:uid(),title:'10 مشاوير رياضة',track:'personal',metric:'manual',target:10,unit:'مرة',progress:0,due:''}];
   return s;
 }
 function normalize(o){
@@ -881,6 +889,7 @@ function normalize(o){
   s.profile=Object.assign({...DEF_PROFILE},o.profile||{});
   s.quran=Object.assign({mem:{},rev:{},log:[]},o.quran||{});
   const qp=o.qplan||{};s.qplan=Object.assign(JSON.parse(JSON.stringify(DEF_QPLAN)),qp);s.qplan.res=Object.assign({...DEF_QPLAN.res},qp.res||{});if(!Array.isArray(s.qplan.names))s.qplan.names=[];
+  if(!qp.found){s.qplan.found='manjaz';s.qplan.foundDays=MANJAZ.length;s.qplan.res.moaser=MZ_SEGS.length;if(!o.profile||!o.profile.goal||o.profile.goal===150)s.profile.goal=180;(Array.isArray(o.goals)?s.goals:[]).forEach(g=>{if(g.metric==='moaser'&&g.target===25){g.target=MZ_SEGS.length;g.due='2026-11-16'}})}
   for(const k of['tasks','schedule','events','rewards','redeemed','sessions','qscores','mocks','subjects','langs','books','words','skills','goals'])if(!Array.isArray(s[k]))s[k]=[];
   for(const k of['done','skip','days','qprog','qdone','claimed','badges'])if(!s[k]||typeof s[k]!=='object'||Array.isArray(s[k]))s[k]={};
   for(const k of['mem','rev'])if(!s.quran[k]||typeof s.quran[k]!=='object')s.quran[k]={};
@@ -933,7 +942,9 @@ function juzPct(key){const[a,b]=JUZ[key];let m=0,t=0;for(let i=a;i<=b;i++){m+=me
 function needReview(){const td=today(),out=[];for(let i=1;i<=114;i++){if(memOf(i)>0){const r=S.quran.rev[i];const age=r?daysBetween(r,td):999;if(age>7)out.push({i,n:SURAHS[i-1].n,age})}}return out.sort((a,b)=>b.age-a.age)}
 const resDone=(r,i)=>!!(S.qprog[r]&&S.qprog[r][i]);
 const resCount=r=>{const m=S.qprog[r]||{},n=+S.qplan.res[r]||0;let c=0;for(const i in m)if(+i<=n)c++;return c};
-const lessonName=i=>(S.qplan.names[i-1]||'').trim()||`الدرس ${i}`;
+const isMZ=()=>S.qplan.found==='manjaz';
+const lessonName=i=>{if(isMZ()&&MZ_SEGS[i-1]){const s=MZ_SEGS[i-1];return `${MZ_BABS[s.b]} · درس ${s.no}: ${s.name}${s.part!=='كامل'?' ('+s.part+')':''}`}return (S.qplan.names[i-1]||'').trim()||`الدرس ${i}`};
+const lessonMeta=i=>{const s=MZ_SEGS[i-1];return s?`${s.pages} · ${s.v} فيديو · ${Math.round(s.sec/60)} د`:''};
 
 /* Qudurat plan: one month of quant foundation, then quant + verbal training until the exam */
 let planCache={key:'',plan:[]};
@@ -942,10 +953,11 @@ function qPlan(){
   if(planCache.key===key)return planCache.plan;
   const plan=[];
   if(exam&&P.start&&P.start<exam){
-    const total=daysBetween(P.start,exam),fd=clamp(+P.foundDays||30,1,Math.max(1,total-1)),R=P.res;
+    const total=daysBetween(P.start,exam),fd=P.found==='manjaz'?Math.min(MANJAZ.length,Math.max(1,total-1)):clamp(+P.foundDays||30,1,Math.max(1,total-1)),R=P.res;
     const reviews=Math.floor(fd/6),lessonDays=Math.max(1,fd-reviews),L=+R.moaser||25;let li=0;
     for(let i=0;i<fd;i++){
       const k=addDays(P.start,i);
+      if(P.found==='manjaz'){if(MANJAZ[i].rest){plan.push({k,ph:'rest',items:[]});continue}const items=[];MZ_SEGS.forEach((s,j)=>{if(s.di===i)items.push({res:'moaser',from:j+1,to:j+1})});plan.push({k,ph:'found',items});continue}
       if((i+1)%6===0){plan.push({k,ph:'found',items:[{kind:'review',text:'مراجعة دروس الأسبوع وحل أخطائك'}]});continue}
       const a=Math.floor(li*L/lessonDays)+1,b=Math.floor((li+1)*L/lessonDays);li++;
       plan.push({k,ph:'found',items:b>=a?[{res:'moaser',from:a,to:b}]:[{kind:'review',text:'مراجعة وتثبيت'}]});
@@ -972,8 +984,8 @@ function qPlan(){
 const planDay=k=>qPlan().find(x=>x.k===k);
 function itemInfo(D,it,i){
   if(it.res){const R=QRES[it.res],a=it.from,b=it.to,cnt=b-a+1;let dn=0;for(let x=a;x<=b;x++)if(resDone(it.res,x))dn++;
-    const title=it.res==='moaser'?(a===b?`المعاصر: ${lessonName(a)}`:`المعاصر: ${lessonName(a)} — ${lessonName(b)}`):`${R.n}: ${a===b?R.unit+' '+a:R.units+' '+a+'–'+b}`;
-    const sub=it.res==='moaser'?'شرح + تدريبات + بنوك':`${cnt} ${cnt===1?R.unit:R.units}`;
+    const title=it.res==='moaser'?(isMZ()?lessonName(a):a===b?`المعاصر: ${lessonName(a)}`:`المعاصر: ${lessonName(a)} — ${lessonName(b)}`):`${R.n}: ${a===b?R.unit+' '+a:R.units+' '+a+'–'+b}`;
+    const sub=it.res==='moaser'?(isMZ()?lessonMeta(a):'شرح + تدريبات + بنوك'):`${cnt} ${cnt===1?R.unit:R.units}`;
     return{title,sub,done:dn===cnt,dn,cnt,sec:R.sec}}
   if(it.kind==='mock')return{title:'اختبار محاكي كامل',sub:'بوقت حقيقي',done:S.mocks.some(m=>m.d===D.k)||!!S.qdone[D.k+':'+i],sec:'quant'};
   return{title:it.text,sub:'مراجعة',done:!!S.qdone[D.k+':'+i],sec:'quant'};
@@ -1177,7 +1189,7 @@ function vToday(){
    <div class="hd-btns"><button class="hb" data-act="go" data-tab="journey" aria-label="رحلتك بالأرقام">${icon('chart')}</button><button class="hb" data-act="focus-open" aria-label="جلسة تركيز">${icon('focus')}${T.running?'<span class="dot"></span>':''}</button><button class="hb" data-act="settings" aria-label="الإعدادات">${icon('more')}</button></div></div>
   <div class="prog"><div class="prog-top"><b class="num" data-count="${pct}" data-suf="% مكتمل">${pct}% مكتمل</b><span class="num">${dn} من ${n}</span></div><div class="pline"><i style="width:${pct}%"></i></div></div>
   ${poemCard()}
-  <div class="gchips">${dl>0?`<button class="gchip" data-act="sec" data-sec="study">${icon('flag')}<span>القدرات</span><b class="num">${dl} ${daysWord(dl)}</b></button>`:''}${goals.map(g=>{const p=clamp(goalVal(g)/g.target,0,1);return `<button class="gchip t-${g.track}" data-act="go" data-tab="goals">${miniRing(p)}<span>${esc(g.title)}</span><b class="num">${Math.round(p*100)}%</b></button>`}).join('')}</div>
+  <div class="gchips">${(planDay(td)||{}).ph==='rest'?`<span class="gchip">${icon('moon')}<span>اليوم راحة من الخطة</span></span>`:''}${dl>0?`<button class="gchip" data-act="sec" data-sec="study">${icon('flag')}<span>القدرات</span><b class="num">${dl} ${daysWord(dl)}</b></button>`:''}${goals.map(g=>{const p=clamp(goalVal(g)/g.target,0,1);return `<button class="gchip t-${g.track}" data-act="go" data-tab="goals">${miniRing(p)}<span>${esc(g.title)}</span><b class="num">${Math.round(p*100)}%</b></button>`}).join('')}</div>
   <div class="tabs3" role="group" aria-label="اليوم">${[['today','اليوم',itT.length],['tomorrow','غداً',itM.length],['later','لاحقاً',later.length]].map(([v,l,c])=>`<button data-act="ui" data-k="dayTab" data-v="${v}" aria-pressed="${tab===v}">${l}<small class="num">${c}</small></button>`).join('')}</div>
   <div class="pane">${list.length?`<ul class="tlist">${list.map((x,i)=>taskCard(x,i)).join('')}</ul>`:`<p class="empty">${tab==='later'?'ما فيه مهام مؤجلة. أي مهمة «مرة وحدة» بتاريخ بعيد تطلع هنا.':'ما فيه مهام هنا. اضغط + وأضف أول مهمة.'}</p>`}
   ${tab==='today'&&h>=21&&undone?`<button class="night-note" data-act="night">${icon('moon')}<span>${undone} مهام ما لحقت عليها اليوم، وهذا عادي.</span><b>راجعها</b></button>`:''}</div>
@@ -1270,22 +1282,22 @@ function vStudy(){const td=today(),ex=S.profile.examDate,dl=ex?daysBetween(td,ex
 function studyPlan(){const plan=qPlan(),td=today();
   if(!plan.length)return `<p class="empty">حدد موعد اختبارك وتاريخ بداية الخطة.</p><button class="add-row" data-act="qplan">${icon('edit')} تعديل الخطة</button>`;
   const fd=plan.filter(d=>d.ph==='found').length,tdN=plan.filter(d=>d.ph==='train').length,total=plan.length,idx=plan.findIndex(d=>d.k===td),pos=idx>=0?idx:(td<plan[0].k?-1:total-1);
-  const groups={found:'المرحلة 1 · تأسيس كمّي فقط (المعاصر 11)',train:'المرحلة 2 · تدريب: المفكر ثم الحمراء، وإيهاب ثم الأكثر تكرار',review:'المراجعة الأخيرة',exam:'يوم الاختبار'};
+  const groups={rest:'',found:isMZ()?'المرحلة 1 · تأسيس كمّي: جدول منجز 1 (المعاصر 11)':'المرحلة 1 · تأسيس كمّي فقط (المعاصر 11)',train:'المرحلة 2 · تدريب: المفكر ثم الحمراء، وإيهاب ثم الأكثر تكرار',review:'المراجعة الأخيرة',exam:'يوم الاختبار'};
   const lo=ui.planAll?0:Math.max(0,(pos<0?0:pos)-1),hi=ui.planAll?total:Math.min(total,(pos<0?0:pos)+7);let list='',lastPh='';
-  for(let i=lo;i<hi;i++){const X=plan[i];if(X.ph!==lastPh){lastPh=X.ph;list+=`<li class="pl-g">${groups[X.ph]}</li>`}
-    const f=X.items.map((it,j)=>itemInfo(X,it,j)),done=planDayDone(X),st=X.k===td?'today':X.k<td?(done?'done':(planDayStarted(X)?'part':'miss')):'up';
-    list+=`<li><button class="pl-day ${st} ph-${X.ph}" data-act="plan-open" data-k="${X.k}"><span class="pl-n num">${X.ph==='exam'?icon('flag'):i+1}</span><span class="pl-m"><b>${esc(WDS[dow(X.k)])} ${esc(gshort(X.k))}${X.k===td?' · اليوم':''}</b><small>${X.ph==='exam'?'اختبار القدرات':esc(f.map(x=>x.title).join(' · '))}</small></span><span class="pl-s">${st==='done'?icon('check'):st==='miss'?'!':st==='part'?'…':''}</span></button></li>`}
+  for(let i=lo;i<hi;i++){const X=plan[i];if(X.ph!=='rest'&&X.ph!==lastPh){lastPh=X.ph;list+=`<li class="pl-g">${groups[X.ph]}</li>`}
+    const f=X.items.map((it,j)=>itemInfo(X,it,j)),done=planDayDone(X),mzMin=Math.round(X.items.reduce((a,it)=>a+(it.res==='moaser'&&isMZ()&&MZ_SEGS[it.from-1]?MZ_SEGS[it.from-1].sec:0),0)/60),st=X.ph==='rest'?'rest':X.k===td?'today':X.k<td?(done?'done':(planDayStarted(X)?'part':'miss')):'up';
+    list+=`<li><button class="pl-day ${st} ph-${X.ph}" data-act="plan-open" data-k="${X.k}"><span class="pl-n num">${X.ph==='exam'?icon('flag'):X.ph==='rest'?icon('moon'):i+1}</span><span class="pl-m"><b>${esc(WDS[dow(X.k)])} ${esc(gshort(X.k))}${X.k===td?' · اليوم':''}${mzMin?` · ${mzMin} د شرح`:''}</b><small>${X.ph==='exam'?'اختبار القدرات':X.ph==='rest'?'راحة':esc(f.map(x=>isMZ()&&X.ph==='found'?x.title.replace(/^.*? · /,''):x.title).join(' · '))}</small></span><span class="pl-s">${st==='done'?icon('check'):st==='miss'?'!':st==='part'?'…':''}</span></button></li>`}
   return `<div class="card"><div class="phase-bar" aria-label="مراحل الخطة"><i class="ph-found" style="flex:${fd}"></i><i class="ph-train" style="flex:${tdN||0.01}"></i><i class="ph-review" style="flex:1"></i><i class="ph-exam" style="flex:1"></i>${pos>=0?`<b class="ph-me" style="inset-inline-start:${((pos+.5)/total*100).toFixed(1)}%"></b>`:''}</div>
   <div class="ph-leg"><span><i class="ph-found"></i>تأسيس ${fd} ${daysWord(fd)}</span><span><i class="ph-train"></i>تدريب ${tdN} ${daysWord(tdN)}</span><span><i class="ph-exam"></i>الاختبار ${esc(gshort(S.profile.examDate))}</span></div></div>
   <h3 class="sec-t">أيام الخطة<button class="back-link" style="margin:0;color:var(--accent)" data-act="ui" data-k="planAll" data-v="${ui.planAll?'0':'1'}">${ui.planAll?'اختصر':'الخطة كاملة'}</button></h3>
   <ul class="plan-list">${list}</ul>
-  <div class="btn-row" style="margin-top:14px"><button class="btn ghost" data-act="qplan">${icon('edit')} تعديل الخطة</button><button class="btn ghost" data-act="lessons">${icon('list')} أسماء الدروس</button></div>
-  <p class="hint">شهر تأسيس كمّي من المعاصر 11 (درس كل يوم، ويوم مراجعة بعد كل 5 دروس)، وبعدها تدريب كمّي ولفظي يتوزع على الأيام الباقية لين الاختبار. مهمة كل يوم تطلع لك في صفحة «اليوم».</p>`}
+  <div class="btn-row" style="margin-top:14px"><button class="btn ghost" data-act="qplan">${icon('edit')} تعديل الخطة</button>${isMZ()?'':`<button class="btn ghost" data-act="lessons">${icon('list')} أسماء الدروس</button>`}</div>
+  ${isMZ()?'<p class="hint">التأسيس حسب جدول منجز 1 (منصة تقدر): 3 ساعات شرح باليوم بين العصر والمغرب، شغّل الفيديو على 1.5x، والتدريب والاختبارات بعد المغرب، والجمعة راحة. بعدها تدريب كمّي ولفظي لين الاختبار.</p>':''}<p class="hint"${isMZ()?' hidden':''}>شهر تأسيس كمّي من المعاصر 11 (درس كل يوم، ويوم مراجعة بعد كل 5 دروس)، وبعدها تدريب كمّي ولفظي يتوزع على الأيام الباقية لين الاختبار. مهمة كل يوم تطلع لك في صفحة «اليوم».</p>`}
 function studyRes(){const plan=qPlan(),td=today(),P=planDay(td),due={};if(P)P.items.forEach(it=>{if(it.res)for(let x=it.from;x<=it.to;x++)due[it.res+':'+x]=1});
   const lessonDate={};plan.forEach(D=>D.items.forEach(it=>{if(it.res==='moaser')for(let x=it.from;x<=it.to;x++)lessonDate[x]=D.k}));
   const card=key=>{const R=QRES[key],n=+S.qplan.res[key]||0,dn=resCount(key);
-    if(key==='moaser'){let rows='';for(let i=1;i<=n;i++){const on=resDone(key,i),ld=lessonDate[i];rows+=`<li class="unit${on?' full':''}${due[key+':'+i]?' part':''}"><button class="u-no num" data-act="cell" data-r="${key}" data-i="${i}" aria-pressed="${on}" aria-label="${esc(lessonName(i))}">${on?icon('check'):i}</button><div class="u-main"><b>${esc(lessonName(i))}</b><span class="u-meta">${ld?(due[key+':'+i]?'درس اليوم':esc(WDS[dow(ld)]+' '+gshort(ld))):''}</span></div></li>`}
-      return `<article class="qmap t-quant"><div class="qm-head"><h3>${R.n} · ${R.sub}</h3><span class="num">${dn}/${n}</span></div>${SLOGAN}<div class="pline c"><i style="width:${n?dn/n*100:0}%"></i></div><ol class="units">${rows}</ol></article>`}
+    if(key==='moaser'){let rows='',lastB=-1;for(let i=1;i<=n;i++){const on=resDone(key,i),ld=lessonDate[i],ms=isMZ()?MZ_SEGS[i-1]:null;if(ms&&ms.b!==lastB){lastB=ms.b;rows+=`<li class="pl-g">${MZ_BABS[ms.b]}</li>`}rows+=`<li class="unit${on?' full':''}${due[key+':'+i]?' part':''}"><button class="u-no num" data-act="cell" data-r="${key}" data-i="${i}" aria-pressed="${on}" aria-label="${esc(lessonName(i))}">${on?icon('check'):i}</button><div class="u-main"><b>${esc(ms?lessonName(i).replace(/^.*? · /,''):lessonName(i))}</b><span class="u-meta">${ms?esc(lessonMeta(i))+' · ':''}${ld?(due[key+':'+i]?'درس اليوم':esc(WDS[dow(ld)]+' '+gshort(ld))):''}</span></div></li>`}
+      return `<article class="qmap t-quant"><div class="qm-head"><h3>${R.n} · ${isMZ()?'جدول منجز 1':R.sub}</h3><span class="num">${dn}/${n}</span></div>${SLOGAN}<div class="pline c"><i style="width:${n?dn/n*100:0}%"></i></div><ol class="units">${rows}</ol></article>`}
     let cells='';for(let i=1;i<=n;i++){const on=resDone(key,i);cells+=`<button class="cell${on?' on':''}${due[key+':'+i]?' due':''}" data-act="cell" data-r="${key}" data-i="${i}" aria-pressed="${on}" aria-label="${R.unit} ${i}">${i}</button>`}
     return `<article class="qmap t-${R.sec}"><div class="qm-head"><h3>${R.n}</h3><span class="num">${dn}/${n}</span></div><p class="u-meta" style="margin-bottom:10px">${R.sub} · المحدد بالبرتقالي مطلوب اليوم</p><div class="pline c"><i style="width:${n?dn/n*100:0}%"></i></div><div class="cells">${cells}</div></article>`};
   return `<h3 class="grp" style="margin-top:0">الكمّي</h3>${card('moaser')}${card('mufakkir')}${card('red')}<h3 class="grp">اللفظي</h3>${card('ehab')}${card('freq')}<p class="hint">عدد الأقسام تغيّره من «تعديل الخطة» في تبويب الخطة.</p>`}
@@ -1388,6 +1400,7 @@ function vBadges(){const got=Object.keys(S.badges).length;return `<div class="st
 /* ================= start-of-day screen ================= */
 function showSplash(){const td=today(),nm=S.profile.name||'خضري',h=new Date().getHours(),plan=qPlan(),P=planDay(td);let pl='';
   if(P&&P.items.length){const f=P.items.map((it,i)=>itemInfo(P,it,i));pl=`<div class="sp-plan"><small>خطة القدرات اليوم · ${PH[P.ph]}</small><b>${esc(f.map(x=>x.title).join(' · '))}</b>${P.ph==='found'?SLOGAN:''}</div>`}
+  else if(P&&P.ph==='rest')pl='<div class="sp-plan"><small>خطة القدرات</small><b>اليوم راحة، استمتع وارجع بكرة بنشاط</b></div>';
   else if(plan.length&&td<plan[0].k){const d=daysBetween(td,plan[0].k);pl=`<div class="sp-plan"><small>خطة القدرات</small><b>تبدأ ${d===1?'بكرة':'بعد '+d+' '+daysWord(d)}، جهّز كتاب المعاصر 11</b></div>`}
   else if(P&&P.ph==='exam')pl=`<div class="sp-plan"><small>اليوم</small><b>اختبار القدرات! بالتوفيق يا ${esc(nm)}</b></div>`;
   let d=.2;const v=POEM.map(([a,b,hot])=>`<div class="verse${hot?' hot':''}"><span style="animation-delay:${(d+=.32).toFixed(2)}s">${a}</span><span style="animation-delay:${(d+=.32).toFixed(2)}s">${b}</span></div>`).join('');
@@ -1435,8 +1448,8 @@ function planDaySheet(k){const plan=qPlan(),i=plan.findIndex(x=>x.k===k),D=plan[
 function qplanSheet(){const P=S.qplan,p=S.profile;
   openSheet(`${head('تعديل خطة القدرات')}<form data-form="qplan">
   <div class="row2">${fld('بداية الخطة',`<input id="f-qs" type="date" name="start" required value="${esc(P.start)}">`,'f-qs')}${fld('موعد الاختبار',`<input id="f-qe" type="date" name="examDate" required value="${esc(p.examDate)}">`,'f-qe')}</div>
-  <div class="row2">${fld('أيام التأسيس',`<input id="f-fd" type="number" name="foundDays" min="7" max="90" inputmode="numeric" value="${P.foundDays}">`,'f-fd')}${fld('هدف الدرجة',`<input id="f-tg" type="number" name="target" min="50" max="100" inputmode="numeric" value="${p.target}">`,'f-tg')}</div>
-  <p class="lbl" style="margin-bottom:8px">عدد الدروس والأقسام في ملفاتك</p><div class="row2">${QRES_KEYS.map(k=>fld(QRES[k].n,`<input id="f-r-${k}" type="number" name="r_${k}" min="1" max="400" inputmode="numeric" value="${P.res[k]}">`,'f-r-'+k)).join('')}</div>
+  <div class="row2">${P.found==='manjaz'?fld('التأسيس','<p class="hint" style="margin:4px 0 0">جدول منجز 1: 14 يوم مذاكرة وجمعتين راحة</p>'):fld('أيام التأسيس',`<input id="f-fd" type="number" name="foundDays" min="7" max="90" inputmode="numeric" value="${P.foundDays}">`,'f-fd')}${fld('هدف الدرجة',`<input id="f-tg" type="number" name="target" min="50" max="100" inputmode="numeric" value="${p.target}">`,'f-tg')}</div>
+  <p class="lbl" style="margin-bottom:8px">عدد الدروس والأقسام في ملفاتك</p><div class="row2">${QRES_KEYS.filter(k=>!(P.found==='manjaz'&&k==='moaser')).map(k=>fld(QRES[k].n,`<input id="f-r-${k}" type="number" name="r_${k}" min="1" max="400" inputmode="numeric" value="${P.res[k]}">`,'f-r-'+k)).join('')}</div>
   ${actions()}</form>`)}
 function lessonsSheet(){const n=+S.qplan.res.moaser||25,lines=[];for(let i=1;i<=n;i++)lines.push(S.qplan.names[i-1]||'');
   openSheet(`${head('أسماء دروس المعاصر 11')}<form data-form="lessons"><p class="hint" style="margin:-6px 0 12px">اكتب اسم كل درس من فهرس الكتاب، كل درس في سطر.</p>${fld('الدروس بالترتيب',`<textarea id="f-ls" name="names" rows="12" placeholder="الدرس 1&#10;الدرس 2">${esc(lines.join('\n').replace(/\n+$/,''))}</textarea>`,'f-ls')}${actions()}</form>`)}
