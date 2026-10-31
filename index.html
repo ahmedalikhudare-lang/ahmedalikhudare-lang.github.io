@@ -675,6 +675,21 @@ input[type="range"]{width:100%;accent-color:var(--accent);padding:0;border:0;bac
 .spin-dots i{width:12px;height:12px;border-radius:50%;background:var(--accent);animation:bounceDot 1.2s infinite ease-in-out both}
 .spin-dots i:nth-child(2){animation-delay:.16s}.spin-dots i:nth-child(3){animation-delay:.32s}
 
+/* ---------- Qudurat timer ---------- */
+.qt-q{display:flex;justify-content:center;align-items:baseline;gap:10px;font-size:13.5px;opacity:.9}
+.qt-q b{font-size:24px;font-weight:900}
+#qt-pace{text-align:center;font-size:13.5px;font-weight:700;margin-top:-6px}
+#qt-pace.ok{color:var(--sage)}
+#qt-pace.late{color:var(--poem-hot)}
+.qt-splits{display:flex;gap:4px;justify-content:center;align-items:flex-end;height:36px;flex-wrap:nowrap;overflow:hidden}
+.qt-splits i{flex:0 1 16px;min-width:4px;height:6px;border-radius:4px;background:var(--night-2);box-shadow:inset 0 0 0 1px var(--night-line);transition:height .35s var(--spring),background .3s}
+.qt-splits i.ok{background:var(--sage);box-shadow:none;height:calc(var(--h,.3) * 36px)}
+.qt-splits i.slow{background:var(--poem-hot);box-shadow:none;height:calc(var(--h,.3) * 36px)}
+.qt-splits i.cur{background:var(--sand);box-shadow:none;height:12px;animation:pulse 1.2s infinite}
+.qt-ring.low .prg{stroke:var(--poem-hot);animation:pulse 1s infinite}
+.fo-btns .qt-next{min-width:210px}
+.qt-go{width:100%;height:50px}
+
 /* ---------- install & share link ---------- */
 .install-card{margin-top:16px;background:linear-gradient(160deg,var(--sage-soft),var(--surface) 70%)}
 .steps-ios{margin:0 0 6px;padding-inline-start:22px;display:grid;gap:10px;font-size:15px}
@@ -719,7 +734,7 @@ const SRC=(()=>{try{const st=document.getElementById('darb-style'),sc=document.c
 const HEAD_CSS=(()=>{try{const s=document.head&&document.head.querySelector('style');return s?s.textContent:''}catch(e){return ''}})()||':root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}';
 let FAM=null;try{const el=document.getElementById('darb-family');FAM=el?JSON.parse(el.textContent||'null'):null}catch(e){FAM=null}
 const FAM0=FAM,IN_CLAUDE=!!(window.claude&&typeof window.claude.use==='function');
-document.getElementById('app').innerHTML="<svg width=\"0\" height=\"0\" style=\"position:absolute\" aria-hidden=\"true\" focusable=\"false\"><defs><pattern id=\"hatch\" width=\"6\" height=\"6\" patternUnits=\"userSpaceOnUse\" patternTransform=\"rotate(45)\"><line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"6\" style=\"stroke:var(--accent);stroke-width:1.2;opacity:.35\"/></pattern></defs></svg><div id=\"mini-slot\"></div><main id=\"view\" class=\"view\"></main><div id=\"fab-slot\"></div><nav class=\"tabs\" aria-label=\"أقسام التطبيق\"><div class=\"tabs-in\" id=\"tabs\"></div></nav><div class=\"focus-ov\" id=\"focus\" hidden role=\"dialog\" aria-modal=\"true\" aria-label=\"جلسة تركيز\"><div class=\"fo-in\" id=\"focus-in\"></div></div><div class=\"sheet-wrap\" id=\"sheet\" hidden><div class=\"sheet\" id=\"sheet-box\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"sheet-title\"><div class=\"grab\"></div><div id=\"sheet-body\"></div></div></div><div class=\"modal\" id=\"modal\" hidden></div><div class=\"splash\" id=\"splash\" hidden role=\"dialog\" aria-modal=\"true\" aria-label=\"بداية اليوم\"></div><div class=\"toast\" id=\"toast\" role=\"status\" aria-live=\"polite\"></div><canvas id=\"fx\" aria-hidden=\"true\"></canvas>";
+document.getElementById('app').innerHTML="<svg width=\"0\" height=\"0\" style=\"position:absolute\" aria-hidden=\"true\" focusable=\"false\"><defs><pattern id=\"hatch\" width=\"6\" height=\"6\" patternUnits=\"userSpaceOnUse\" patternTransform=\"rotate(45)\"><line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"6\" style=\"stroke:var(--accent);stroke-width:1.2;opacity:.35\"/></pattern></defs></svg><div id=\"mini-slot\"></div><main id=\"view\" class=\"view\"></main><div id=\"fab-slot\"></div><nav class=\"tabs\" aria-label=\"أقسام التطبيق\"><div class=\"tabs-in\" id=\"tabs\"></div></nav><div class=\"focus-ov\" id=\"focus\" hidden role=\"dialog\" aria-modal=\"true\" aria-label=\"جلسة تركيز\"><div class=\"fo-in\" id=\"focus-in\"></div></div><div class=\"sheet-wrap\" id=\"sheet\" hidden><div class=\"sheet\" id=\"sheet-box\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"sheet-title\"><div class=\"grab\"></div><div id=\"sheet-body\"></div></div></div><div class=\"modal\" id=\"modal\" hidden></div><div class=\"splash\" id=\"splash\" hidden role=\"dialog\" aria-modal=\"true\" aria-label=\"بداية اليوم\"></div><div class=\"toast\" id=\"toast\" role=\"status\" aria-live=\"polite\"></div><div class=\"focus-ov\" id=\"qt\" hidden role=\"dialog\" aria-modal=\"true\" aria-label=\"مؤقت القدرات\"><div class=\"fo-in\" id=\"qt-in\"></div></div><canvas id=\"fx\" aria-hidden=\"true\"></canvas>";
 /* ================= utils ================= */
 const $=(s,r=document)=>r.querySelector(s);
 const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
@@ -831,7 +846,7 @@ const icon=(n,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" fill="none" strok
 const EMBLEM='<svg class="emb" viewBox="0 0 120 120" aria-hidden="true"><circle class="e1" cx="60" cy="60" r="54" fill="none" style="stroke:var(--sage)" stroke-width="3"/><circle class="e2" cx="60" cy="60" r="43" fill="none" style="stroke:var(--accent)" stroke-width="2" stroke-dasharray="4 6"/><path class="e3" d="M38 61l15 15 30-32" fill="none" style="stroke:var(--accent)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path class="e4" d="M86 30l2.4 5 5.6.8-4 3.9 1 5.5-5-2.6-5 2.6 1-5.5-4-3.9 5.6-.8z" style="fill:var(--star)"/></svg>';
 
 /* ================= state ================= */
-const LS={splash:'darb.splash.v1',state:'darb.state.v1',synced:'darb.synced.v1',timer:'darb.timer.v1',ui:'darb.ui.v2',mode:'darb.mode.v1'};
+const LS={qt:'darb.qt.v1',splash:'darb.splash.v1',state:'darb.state.v1',synced:'darb.synced.v1',timer:'darb.timer.v1',ui:'darb.ui.v2',mode:'darb.mode.v1'};
 const DEF_PROFILE={name:'خضري',goal:150,examDate:'2026-12-17',target:90};
 const DEF_QPLAN={start:'2026-11-01',foundDays:30,res:{moaser:25,mufakkir:90,red:90,ehab:70,freq:20},names:[]};
 function blank(){return{v:4,since:today(),updatedAt:0,starter:false,noteSeen:false,profile:{...DEF_PROFILE},xp:0,spent:0,best:0,lvSeen:1,
@@ -1016,7 +1031,7 @@ function missions(){
 }
 
 /* ================= UI state & theme ================= */
-const ui=Object.assign({tab:'today',sec:null,dayTab:'today',goalTab:'active',jRange:'week',studyTab:'plan',planAll:false,quranTab:'list',quranFilter:'amma',langTab:'books',bookFilter:'reading',schedMode:'day',planDay:null,weekOff:0,monthOff:0,shopTab:'missions'},(()=>{try{return JSON.parse(lsGet(LS.ui)||'{}')}catch(e){return{}}})());
+const ui=Object.assign({tab:'today',sec:null,dayTab:'today',goalTab:'active',jRange:'week',studyTab:'plan',planAll:false,quranTab:'list',quranFilter:'amma',langTab:'books',bookFilter:'reading',schedMode:'day',planDay:null,weekOff:0,monthOff:0,shopTab:'missions',qtMode:'section'},(()=>{try{return JSON.parse(lsGet(LS.ui)||'{}')}catch(e){return{}}})());
 const saveUI=()=>lsSet(LS.ui,JSON.stringify(ui));
 if(ui.planDay==null)ui.planDay=dow(today());
 let famLoading=false,famLink=false;
@@ -1165,7 +1180,7 @@ function vToday(){
 }
 function taskCard(x,n){
   const td=today();
-  if(x.type==='plan'){const f=x.f;return `<li class="tk t-${f.sec}${f.done?' done':''}${x.k>td?' future':''}" style="--i:${n||0}" data-swipe="plan" data-k="${x.k}" data-i="${x.i}" data-pid="p${x.i}"><div class="tk-bg ok">${icon('check')}</div><div class="tk-card"><i class="tk-bar"></i><button class="tk-check" data-act="pitem" data-k="${x.k}" data-i="${x.i}" aria-pressed="${f.done}" aria-label="${esc(f.title)}">${f.done?icon('check'):(f.cnt>1&&f.dn?`<small class="num">${f.dn}/${f.cnt}</small>`:'')}</button><div class="tk-main" data-act="pitem" data-k="${x.k}" data-i="${x.i}"><b>${esc(f.title)}</b><span class="tk-meta"><span class="ps plan">${icon('target')} خطة القدرات</span><span>${esc(f.sub)}</span></span></div><span class="tk-side">${icon('book')}</span></div></li>`}
+  if(x.type==='plan'){const f=x.f;return `<li class="tk t-${f.sec}${f.done?' done':''}${x.k>td?' future':''}" style="--i:${n||0}" data-swipe="plan" data-k="${x.k}" data-i="${x.i}" data-pid="p${x.i}"><div class="tk-bg ok">${icon('check')}</div><div class="tk-card"><i class="tk-bar"></i><button class="tk-check" data-act="pitem" data-k="${x.k}" data-i="${x.i}" aria-pressed="${f.done}" aria-label="${esc(f.title)}">${f.done?icon('check'):(f.cnt>1&&f.dn?`<small class="num">${f.dn}/${f.cnt}</small>`:'')}</button><div class="tk-main" data-act="pitem" data-k="${x.k}" data-i="${x.i}"><b>${esc(f.title)}</b><span class="tk-meta"><span class="ps plan">${icon('target')} خطة القدرات</span><span>${esc(f.sub)}</span></span></div><span class="tk-side">${(()=>{const it=((planDay(x.k)||{}).items||[])[x.i];return it&&it.res&&!f.done&&x.k===td?`<button class="ib" data-act="qt-quick" data-k="${x.k}" data-i="${x.i}" aria-label="ابدأ مؤقت: ${esc(f.title)}">${icon('timer')}</button>`:icon('book')})()}</span></div></li>`}
   const t=x.t,k=x.k,done=x.done,late=k===td&&t.time&&toMin(t.time)<nowMin()&&!done,prev=t.repeat==='once'&&!t.doneOn&&t.date&&t.date<k;
   const pills=(t.repeat==='daily'?`<span class="ps daily">${icon('repeat')} يومياً</span>`:t.repeat==='days'?`<span class="ps daily">${icon('repeat')} ${(t.days||[]).map(d=>WDS[d]).join('، ')}</span>`:'')+(prev?`<span class="ps prev">${t.date===addDays(k,-1)?'من الأمس':'متأخرة من '+gshort(t.date)}</span>`:'')+(late?'<span class="ps late">تأخرت</span>':'')+(x.later?`<span class="ps prev">${esc(gshort(t.date))}</span>`:'');
   return `<li class="tk t-${t.track}${done?' done':''}${k>td?' future':''}" style="--i:${n||0}" data-swipe="task" data-id="${t.id}" data-k="${k}" data-pid="${t.id}"><div class="tk-bg ok">${icon('check')}</div><div class="tk-bg del"><button data-act="swipe-del" data-id="${t.id}" aria-label="حذف ${esc(t.title)}">${icon('trash')}</button></div>
@@ -1243,8 +1258,8 @@ function vMore(){const td=today(),plan=qPlan(),idx=plan.findIndex(d=>d.k===td),b
 function vStudy(){const td=today(),ex=S.profile.examDate,dl=ex?daysBetween(td,ex):null,totSec=sum(QRES_KEYS,r=>+S.qplan.res[r]||0),dnSec=sum(QRES_KEYS,resCount),p=totSec?dnSec/totSec:0;
   return `<div class="stg">${secTop(dl>0?`اختبارك بعد ${dl} ${daysWord(dl)} · هدفك ${S.profile.target}`:'القدرات','خطة القدرات')}
   <div class="prog"><div class="prog-top"><b class="num">${Math.round(p*100)}% من المصادر</b><span class="num">${dnSec} من ${totSec} درس وقسم</span></div><div class="pline"><i style="width:${p*100}%"></i></div></div>
-  ${seg('studyTab',[['plan','الخطة'],['res','المصادر'],['score','النتائج'],['sub','المواد']])}
-  <div class="pane" style="margin-top:14px">${ui.studyTab==='res'?studyRes():ui.studyTab==='score'?studyScore():ui.studyTab==='sub'?itemsView('subjects'):studyPlan()}</div></div>`}
+  ${seg('studyTab',[['plan','الخطة'],['timer','المؤقت'],['res','المصادر'],['score','النتائج'],['sub','المواد']])}
+  <div class="pane" style="margin-top:14px">${ui.studyTab==='timer'?studyTimer():ui.studyTab==='res'?studyRes():ui.studyTab==='score'?studyScore():ui.studyTab==='sub'?itemsView('subjects'):studyPlan()}</div></div>`}
 function studyPlan(){const plan=qPlan(),td=today();
   if(!plan.length)return `<p class="empty">حدد موعد اختبارك وتاريخ بداية الخطة.</p><button class="add-row" data-act="qplan">${icon('edit')} تعديل الخطة</button>`;
   const fd=plan.filter(d=>d.ph==='found').length,tdN=plan.filter(d=>d.ph==='train').length,total=plan.length,idx=plan.findIndex(d=>d.k===td),pos=idx>=0?idx:(td<plan[0].k?-1:total-1);
@@ -1272,7 +1287,7 @@ function studyScore(){const acc=key=>{const L=S.qscores.filter(s=>s.r===key&&s.n
   <div class="tiles2" style="margin-top:12px">${QRES_KEYS.filter(k=>k!=='moaser').map(k=>{const a=acc(k);return `<div class="stat t-${QRES[k].sec}"><span class="chip">${QRES[k].n}</span><b class="num">${a.acc==null?'—':a.acc+'%'}</b><small>${a.n?`${a.c} صح من ${a.n}`:'ما فيه درجات'}</small></div>`}).join('')}</div>
   <h3 class="sec-t">الاختبارات المحاكية<small>أعلى درجة ${best||'—'}</small></h3><div class="card">${mockChart()}</div>
   ${S.mocks.length?`<div class="card"><ul class="rows">${S.mocks.slice(0,6).map(m=>`<li><span class="r-main"><b class="num">${m.score} من 100</b><small>${esc(greg(m.d))}</small></span><button class="ib" data-act="del-mock" data-id="${m.id}" aria-label="حذف">${icon('trash')}</button></li>`).join('')}</ul></div>`:''}
-  ${S.qscores.length?`<h3 class="sec-t">آخر الدرجات</h3><div class="card"><ul class="rows">${S.qscores.slice(0,8).map(s=>`<li><span class="r-main"><b>${esc(QRES[s.r]?QRES[s.r].n:'')} · ${QRES[s.r]?QRES[s.r].unit:''} ${s.i}</b><small class="num">${s.c}/${s.n} · ${Math.round(s.c/s.n*100)}% · ${esc(ago(s.d))}</small></span><button class="ib" data-act="del-score" data-id="${s.id}" aria-label="حذف">${icon('trash')}</button></li>`).join('')}</ul></div>`:''}`}
+  ${S.qscores.length?`<h3 class="sec-t">آخر الدرجات</h3><div class="card"><ul class="rows">${S.qscores.slice(0,8).map(s=>`<li><span class="r-main"><b>${esc(QRES[s.r]?QRES[s.r].n:'')} · ${QRES[s.r]?QRES[s.r].unit:''} ${s.i}</b><small class="num">${s.c}/${s.n} · ${Math.round(s.c/s.n*100)}%${s.s?' · '+Math.round(s.s/s.n)+' ث للسؤال':''} · ${esc(ago(s.d))}</small></span><button class="ib" data-act="del-score" data-id="${s.id}" aria-label="حذف">${icon('trash')}</button></li>`).join('')}</ul></div>`:''}`}
 function mockChart(){const ms=S.mocks.slice(0,12).reverse();if(!ms.length)return `<p class="hint" style="text-align:center;margin:8px 0">سجّل أول اختبار محاكي ويطلع لك منحنى تقدّمك هنا.</p>`;
   const W=320,H=150,pl=28,pr=14,pt=18,pb=24,tgt=+S.profile.target||90,mn=Math.min(...ms.map(m=>m.score),tgt),lo=Math.max(0,Math.min(50,Math.floor((mn-5)/10)*10)),hi=100,step=hi-lo>50?20:10;
   const x=i=>ms.length===1?(pl+(W-pl-pr)/2):pl+i*(W-pl-pr)/(ms.length-1),y=v=>pt+(hi-v)*(H-pt-pb)/(hi-lo);
@@ -1549,6 +1564,11 @@ const ACT={
   'fam-preview':()=>{closeSheet();viewMode='preview';render({enter:true,dir:'fwd'});window.scrollTo(0,0)},
   'fam-back':()=>{viewMode='app';render({enter:true,dir:'back'});window.scrollTo(0,0)},
   'poem-next':()=>nextVerse(),
+  'qt-next':()=>qtNext(),'qt-pause':()=>qtPause(),'qt-resume':()=>qtResume(),'qt-end':()=>qtFinish('done'),'qt-open':()=>openQT(),
+  'qt-quit':el=>{if(!armed(el,'متأكد؟'))return;QT.active=false;QT.running=false;saveQT();wake(false);closeQT();render();toast('طلعت بدون تسجيل')},
+  'qt-skip':()=>{if(qtRes){const m=Math.floor(qtRes.used/60000);if(m>=1)commit(()=>qtCredit(m,today(),'quant'))}qtRes=null;closeSheet()},
+  'qt-quick':el=>{if(QT.active){openQT();return}const D=planDay(el.dataset.k),it=D&&D.items[+el.dataset.i];if(!it||!it.res)return;let x=it.from;for(let j=it.from;j<=it.to;j++)if(!resDone(it.res,j)){x=j;break}qtStart({mode:'section',r:it.res,i:x,n:qtDefN(it.res),per:qtDefPer(it.res)})},
+  'study-focus':()=>openFocus('study','quant'),
   'fam-exit':()=>{famLink=false;FAM=FAM0;viewMode='app';try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}render({enter:true,dir:'back'});window.scrollTo(0,0)},
   install:()=>doInstall(),
   'install-hide':()=>{lsSet('darb.installHide','1');render()},
@@ -1590,6 +1610,13 @@ const FORMS={
     commit(()=>{it.min=(it.min||0)+m;const d=day(k);d.min+=m;d.tr[tr]=(d.tr[tr]||0)+m;addXP(k,m);S.sessions.unshift({id:uid(),d:k,t:Date.now(),min:m,track:tr,sub:it.id})});closeSheet();toast(`+${m} دقيقة لـ«${it.name}»`)},
   reward(fd,f){const title=(fd.get('title')||'').trim(),cost=clamp(+fd.get('cost')||0,10,100000);if(!title)return;commit(()=>{let r=f.dataset.id&&S.rewards.find(x=>x.id===f.dataset.id);if(!r){r={id:uid()};S.rewards.push(r)}Object.assign(r,{title,cost})});closeSheet()},
   goal(fd,f){const title=(fd.get('title')||'').trim();if(!title)return;commit(()=>{let g=f.dataset.id&&S.goals.find(x=>x.id===f.dataset.id);if(!g){g={id:uid(),progress:0};S.goals.push(g)}Object.assign(g,{title,track:fd.get('track')||'study',metric:fd.get('metric')||'manual',target:clamp(+fd.get('target')||1,1,100000),unit:(fd.get('unit')||'').trim(),due:fd.get('due')||'',paused:fd.get('paused')==='1'})});closeSheet();toast('انحفظ الهدف')},
+  qtstart(fd,f){if(QT.active){openQT();return}if(f.dataset.mode==='mock'){qtStart({mode:'mock',dur:clamp(+fd.get('dur')||120,5,300)});return}
+    const r=fd.get('r')||'mufakkir';if(!QRES[r])return;qtStart({mode:'section',r,i:clamp(+fd.get('i')||1,1,400),n:clamp(+fd.get('n')||11,1,100),per:clamp(+fd.get('per')||60,10,600)})},
+  qtsave(fd){const r=qtRes;if(!r)return;const k=today(),m=Math.floor(r.used/60000);
+    if(r.mode==='section'){const c=+fd.get('c');if(isNaN(c)||c<0||c>r.n){toast('تأكد من الرقم: الصح ما يزيد عن عدد الأسئلة');return}
+      commit(()=>{S.qscores.unshift({id:uid(),r:r.r,i:r.i,c,n:r.n,d:k,s:Math.round(r.used/1000)});if(r.r!=='moaser'&&!resDone(r.r,r.i))markRes(r.r,r.i,true,k);qtCredit(m,k,QRES[r.r].sec)});
+      qtRes=null;closeSheet();const p=c/r.n;if(p>=.8)confetti();toast(p>=.8?`${Math.round(p*100)}%! كفو يا ${S.profile.name||'خضري'}`:`سجّلنا ${Math.round(p*100)}%. راجع أخطاءك وبتطلع أعلى`,true)}
+    else{const sc=clamp(+fd.get('score'),0,100);if(isNaN(sc))return;commit(()=>{S.mocks.unshift({id:uid(),d:k,score:sc,pts:30});S.mocks.sort((a,b)=>a.d<b.d?1:-1);addXP(k,30);day(k).q++;qtCredit(m,k,'quant')});qtRes=null;closeSheet();confetti();toast(`سجّلنا ${sc} في المحاكي`,true)}},
   tcustom(fd){const m=clamp(+fd.get('m')||25,1,240);T.phase='focus';T.dur=T.focusDur=m;T.left=m*60000;saveT();closeSheet();renderFocus()},
   settings(fd){const nm=fd.get('mode');if(nm&&MODES[nm]&&nm!==mode){mode=nm;lsSet(LS.mode,mode);applyMode()}
     commit(()=>{const p=S.profile;p.name=(fd.get('name')||'').trim().slice(0,20)||'خضري';p.goal=clamp(+fd.get('goal')||p.goal,10,900);p.target=clamp(+fd.get('target')||p.target,50,100);const ex=fd.get('examDate');if(ex)p.examDate=ex});closeSheet();toast('انحفظت الإعدادات')}
@@ -1606,8 +1633,8 @@ document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]');if(!el)return;const a=ACT[el.dataset.act];if(a){e.preventDefault();a(el,e)}
 },true);
 document.addEventListener('submit',e=>{e.preventDefault();const f=e.target,h=FORMS[f.dataset.form];if(h)h(new FormData(f),f,e.submitter)});
-document.addEventListener('change',e=>{const t=e.target;if(t.name==='repeat'){t.form.querySelectorAll('[data-show]').forEach(x=>x.hidden=x.dataset.show!==t.value)}});
-document.addEventListener('input',e=>{if(e.target.id==='f-mem'){const o=$('#mem-out');if(o)o.textContent=ad(e.target.value)}});
+document.addEventListener('change',e=>{const t=e.target;if(t.form&&t.form.dataset.form==='qtstart'){if(t.name==='r'&&QRES[t.value]){const f=t.form;f.elements.i.value=qtNextSec(t.value);f.elements.n.value=qtDefN(t.value);const pv=String(qtDefPer(t.value));f.querySelectorAll('input[name=per]').forEach(x=>x.checked=x.value===pv)}qtSum(t.form)}if(t.name==='repeat'){t.form.querySelectorAll('[data-show]').forEach(x=>x.hidden=x.dataset.show!==t.value)}});
+document.addEventListener('input',e=>{if(e.target.form&&e.target.form.dataset.form==='qtstart')qtSum(e.target.form);if(e.target.id==='f-mem'){const o=$('#mem-out');if(o)o.textContent=ad(e.target.value)}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#splash').hidden)ACT['splash-go']();else if(!$('#modal').hidden)$('#modal').hidden=true;else if(!$('#sheet').hidden)closeSheet();else if(!$('#focus').hidden)closeFocus()}
   if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('card3d')){e.preventDefault();ACT['flash-flip']()}});
 /* swipe: left completes, right reveals delete */
@@ -1718,6 +1745,67 @@ window.addEventListener('appinstalled',()=>{installEvt=null;toast('درب صار
 if(!IN_CLAUDE&&'serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 try{if(!IN_CLAUDE&&navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 
+/* ================= Qudurat timer: timed sections (per-question splits) and mock exams ================= */
+const QT_DEF={mode:'section',r:'mufakkir',i:1,n:11,per:60,dur:120,active:false,running:false,total:0,endAt:0,left:0,q:1,splits:[],qElapsed:0,qStartAt:0};
+let QT=(()=>{try{return Object.assign({},QT_DEF,JSON.parse(lsGet(LS.qt)||'{}'))}catch(e){return{...QT_DEF}}})(),qtRes=null;
+const saveQT=()=>lsSet(LS.qt,JSON.stringify(QT));
+const QT_N={moaser:10,mufakkir:11,red:11,ehab:10,freq:10};
+const qtDefN=r=>QT.r===r&&QT.n?QT.n:(QT_N[r]||10);
+const qtDefPer=r=>QT.r===r&&QT.per?QT.per:(QRES[r]&&QRES[r].sec==='verbal'?45:60);
+const qtNextSec=r=>{const n=+S.qplan.res[r]||0;for(let x=1;x<=n;x++)if(!resDone(r,x))return x;return 1};
+const hms=ms=>{const s=Math.max(0,Math.ceil(ms/1000)),h=Math.floor(s/3600);return h?`${h}:${pad(Math.floor(s%3600/60))}:${pad(s%60)}`:mmss(ms)};
+const qtLeft=()=>QT.running?Math.max(0,QT.endAt-Date.now()):QT.left;
+const qtQElapsed=()=>QT.qElapsed+(QT.running?Date.now()-QT.qStartAt:0);
+const qtBudget=()=>QT.q*QT.per*1000-(QT.total-qtLeft());
+const paceText=b=>b>=0?`باقي لك ${Math.ceil(b/1000)} ث على هالسؤال`:`متأخر ${Math.ceil(-b/1000)} ث عن الوتيرة`;
+function qtStart(cfg){unlockAudio();const now=Date.now(),total=cfg.mode==='section'?cfg.n*cfg.per*1000:cfg.dur*60000;
+  QT=Object.assign({},QT_DEF,{r:QT.r,i:QT.i,n:QT.n,per:QT.per,dur:QT.dur},cfg,{active:true,running:true,total,endAt:now+total,left:total,q:1,splits:[],qElapsed:0,qStartAt:now});saveQT();wake(true);openQT()}
+function qtPause(){if(!QT.running)return;QT.left=qtLeft();QT.qElapsed=qtQElapsed();QT.running=false;saveQT();wake(false);renderQT()}
+function qtResume(){if(QT.running||!QT.active)return;unlockAudio();const now=Date.now();QT.endAt=now+QT.left;QT.qStartAt=now;QT.running=true;saveQT();wake(true);renderQT()}
+function qtNext(){if(!QT.active||QT.mode!=='section')return;if(!QT.running)qtResume();QT.splits.push(qtQElapsed());QT.qElapsed=0;QT.qStartAt=Date.now();
+  if(QT.splits.length>=QT.n){saveQT();qtFinish('done');return}QT.q=QT.splits.length+1;saveQT();renderQT()}
+function qtFinish(reason){if(!QT.active)return;const L=qtLeft(),used=QT.total-L,splits=QT.splits.slice();
+  if(QT.mode==='section'&&splits.length<QT.n){const qe=qtQElapsed();if(reason!=='time'||qe>2000)splits.push(qe)}
+  qtRes={mode:QT.mode,r:QT.r,i:QT.i,n:QT.n,per:QT.per,dur:QT.dur,used,splits,reason};
+  QT.active=false;QT.running=false;saveQT();wake(false);closeQT();chime();buzz();qtResultSheet();render()}
+function qtCheck(){if(QT.active&&QT.running&&qtLeft()<=0)qtFinish('time')}
+function openQT(){if(!QT.active)return;$('#qt').hidden=false;document.body.style.overflow='hidden';renderQT()}
+function closeQT(){$('#qt').hidden=true;if($('#focus').hidden&&$('#sheet').hidden)document.body.style.overflow=''}
+function renderQT(){if($('#qt').hidden)return;const el=$('#qt-in');el.innerHTML=qtHTML();arabize(el)}
+function qtHTML(){const L=qtLeft(),tot=QT.total||1,RC=2*Math.PI*120,R=QRES[QT.r]||{},sec=QT.mode==='section',b=qtBudget();
+  const title=sec?`${R.n} · ${R.unit} ${QT.i}`:'اختبار محاكي';
+  return `<div class="fo-top"><button class="hb" data-act="qt-quit" aria-label="اطلع بدون تسجيل">${icon('x')}</button><b>${esc(title)}</b><small class="num">${sec?`${QT.n} سؤال · ${QT.per} ث للسؤال`:fmtDur(QT.dur)}</small></div>
+  <div class="fo-ring qt-ring${L<tot*.1?' low':''}"><svg viewBox="0 0 260 260"><circle class="trk" cx="130" cy="130" r="120"/><circle id="qt-prg" class="prg" cx="130" cy="130" r="120" stroke-dasharray="${RC.toFixed(1)}" stroke-dashoffset="${(RC*(1-L/tot)).toFixed(1)}"/></svg><div class="fo-t"><b id="qt-time">${hms(L)}</b><small>${sec?`سؤال ${QT.q} من ${QT.n}`:(QT.running?'الوقت الباقي':'موقّف')}</small></div></div>
+  ${sec?`<div class="qt-q"><span>هذا السؤال</span><b id="qt-qtime" class="num">${mmss(qtQElapsed())}</b></div><p id="qt-pace" class="${b>=0?'ok':'late'}">${paceText(b)}</p>
+  <div class="qt-splits" aria-label="وقت كل سؤال">${Array.from({length:QT.n},(_,i)=>{const s=QT.splits[i];return s==null?`<i class="${i===QT.q-1?'cur':''}"></i>`:`<i class="${s>QT.per*1000?'slow':'ok'}" style="--h:${clamp(s/(QT.per*2000),.2,1).toFixed(2)}"></i>`}).join('')}</div>`:''}
+  <div class="fo-btns">${sec?`<button class="btn sandb qt-next" data-act="qt-next">${QT.q>=QT.n?'خلّصت آخر سؤال':'السؤال التالي'} ${icon('chevL')}</button>`:''}${QT.running?`<button class="hb" data-act="qt-pause" aria-label="إيقاف مؤقت">${icon('pause')}</button>`:`<button class="hb" data-act="qt-resume" aria-label="كمّل">${icon('play')}</button>`}<button class="btn ghost" data-act="qt-end">${icon('check')} إنهاء</button></div>
+  <p class="fo-line">${sec?'اضغط «السؤال التالي» كل ما تخلّص سؤال، وتعرف وين تتأخر.':'حلّه بنفس ظروف الاختبار، وفي النهاية سجّل درجتك.'}</p>`}
+function qtTick(){if(!QT.active||$('#qt').hidden)return;const L=qtLeft(),t=$('#qt-time');if(t)t.textContent=ad(hms(L));const p=$('#qt-prg');if(p)p.setAttribute('stroke-dashoffset',(2*Math.PI*120*(1-L/(QT.total||1))).toFixed(1));
+  const qe=$('#qt-qtime');if(qe)qe.textContent=ad(mmss(qtQElapsed()));const pc=$('#qt-pace');if(pc){const b=qtBudget();pc.textContent=ad(paceText(b));pc.className=b>=0?'ok':'late'}const rg=$('.qt-ring');if(rg)rg.classList.toggle('low',L<QT.total*.1)}
+function qtCredit(m,k,sub){if(m<1)return;const d=day(k);d.min+=m;d.tr.study=(d.tr.study||0)+m;addXP(k,m);S.sessions.unshift({id:uid(),d:k,t:Date.now(),min:m,track:'study',sub})}
+function qtResultSheet(){const r=qtRes;if(!r)return;const R=QRES[r.r]||{};
+  if(r.mode==='section'){const ans=r.splits.length,avg=ans?r.used/ans:0;let si=-1,sm=0;r.splits.forEach((s,i)=>{if(s>sm){sm=s;si=i}});const over=r.splits.filter(s=>s>r.per*1000).length;
+    openSheet(`${head(r.reason==='time'?'خلص الوقت!':'خلّصت القسم')}<p class="muted" style="margin:-8px 0 14px">${esc(R.n)} · ${R.unit} ${r.i}</p>
+    <div class="mini-stats"><div><b class="num">${hms(r.used)}</b><small>الوقت</small></div><div><b class="num">${Math.round(avg/1000)} ث</b><small>معدل السؤال</small></div><div><b class="num">${ans}/${r.n}</b><small>حليتها</small></div></div>
+    ${si>=0?`<p class="hint" style="margin:-6px 0 14px">${over?`${over} أسئلة أخذت أكثر من ${r.per} ث. `:'كل الأسئلة في وقتها، كفو! '}أبطأ سؤال: رقم ${si+1} (${Math.round(sm/1000)} ث).</p>`:''}
+    <form data-form="qtsave">${fld('كم جبت صح؟',`<input id="f-qc" type="number" name="c" min="0" max="${r.n}" required inputmode="numeric">`,'f-qc')}<div class="quick">${[r.n,r.n-1,r.n-2,r.n-3].filter(x=>x>=0).map(x=>`<button type="button" data-act="setv" data-t="f-qc" data-v="${x}">${x}</button>`).join('')}</div>${actions('<button class="btn ghost" type="button" data-act="qt-skip">بدون تسجيل</button>','سجّل النتيجة')}</form>`)}
+  else openSheet(`${head(r.reason==='time'?'خلص وقت الاختبار':'خلّصت الاختبار')}<div class="mini-stats"><div><b class="num">${fmtDur(r.used/60000)}</b><small>الوقت</small></div><div><b class="num">${fmtDur(r.dur)}</b><small>المدة</small></div><div><b class="num">${Math.round(r.used/(r.dur*600))}%</b><small>من الوقت</small></div></div>
+    <form data-form="qtsave">${fld('درجتك من 100',`<input id="f-qs" type="number" name="score" min="0" max="100" required inputmode="numeric">`,'f-qs')}${actions('<button class="btn ghost" type="button" data-act="qt-skip">بدون تسجيل</button>','سجّل الدرجة · +30')}</form>`)}
+function qtSum(f){const o=f.querySelector('#qt-sum');if(!o)return;const n=+f.elements.n.value||0,pc=f.querySelector('input[name=per]:checked'),per=pc?+pc.value:60;o.textContent=ad(`المجموع ${fmtDur(n*per/60)} · ${n} سؤال`)}
+function studyTimer(){const td=today(),P=planDay(td);let r=QT.r||'mufakkir',i;
+  if(P){const it=P.items.find(it=>{if(!it.res)return false;for(let x=it.from;x<=it.to;x++)if(!resDone(it.res,x))return true;return false});if(it){r=it.res;for(let x=it.from;x<=it.to;x++)if(!resDone(it.res,x)){i=x;break}}}
+  if(!i)i=qtNextSec(r);const n=qtDefN(r),per=qtDefPer(r),timed=S.qscores.filter(s=>s.s).slice(0,5);
+  const sectionForm=`<form data-form="qtstart" data-mode="section">${fld('المصدر',opts('r',QRES_KEYS.map(k=>[k,QRES[k].n,'t-'+QRES[k].sec]),r))}
+    <div class="row2">${fld('رقم القسم',`<input id="f-qi" type="number" name="i" min="1" max="400" inputmode="numeric" value="${i}">`,'f-qi')}${fld('عدد الأسئلة',`<input id="f-qn" type="number" name="n" min="1" max="100" inputmode="numeric" value="${n}">`,'f-qn')}</div>
+    ${fld('الوقت لكل سؤال',opts('per',[[30,'30 ث'],[45,'45 ث'],[60,'60 ث'],[75,'75 ث'],[90,'90 ث']],per))}
+    <p class="hint" id="qt-sum" style="margin:-4px 0 12px">المجموع ${fmtDur(n*per/60)} · ${n} سؤال</p><button class="btn primary qt-go" type="submit">${icon('timer')} ابدأ القسم</button></form>`;
+  const mockForm=`<form data-form="qtstart" data-mode="mock">${fld('مدة الاختبار',opts('dur',[[60,'ساعة'],[90,'ساعة ونص'],[120,'ساعتين']],QT.dur||120))}<p class="hint" style="margin:-4px 0 12px">حلّه مرة وحدة بدون توقف وبنفس ظروف الاختبار، وفي النهاية سجّل درجتك.</p><button class="btn primary qt-go" type="submit">${icon('flag')} ابدأ الاختبار</button></form>`;
+  const focusPart=`<p class="hint" style="margin:0 0 12px">جلسة مذاكرة عادية: 25 أو 45 دقيقة تركيز وبعدها استراحة. مناسبة لشرح دروس المعاصر.</p><button class="btn primary qt-go" data-act="study-focus">${icon('play')} افتح مؤقت التركيز</button>`;
+  return `${QT.active?`<button class="night-note" data-act="qt-open" style="margin:0 0 12px">${icon('timer')}<span>عندك مؤقت شغّال</span><b>ارجع له</b></button>`:''}
+  <div class="card"><div class="c-head"><h2>مؤقت القدرات</h2><small>يحسب وقتك كأنك في الاختبار</small></div>${seg('qtMode',[['section','قسم'],['mock','اختبار محاكي'],['focus','مذاكرة']])}
+  <div style="margin-top:14px">${ui.qtMode==='mock'?mockForm:ui.qtMode==='focus'?focusPart:sectionForm}</div></div>
+  ${timed.length?`<h3 class="sec-t">آخر أقسام بالمؤقت</h3><div class="card"><ul class="rows">${timed.map(s=>`<li><span class="r-main"><b>${esc(QRES[s.r]?QRES[s.r].n:'')} · ${QRES[s.r]?QRES[s.r].unit:''} ${s.i}</b><small class="num">${s.c}/${s.n} صح · ${Math.round(s.s/s.n)} ث للسؤال · ${esc(ago(s.d))}</small></span></li>`).join('')}</ul></div>`:''}`}
+
 /* ================= init ================= */
 (function init(){
   openFamLink(true);
@@ -1728,10 +1816,11 @@ try{if(!IN_CLAUDE&&navigator.storage&&navigator.storage.persist)navigator.storag
   render({enter:true});
   if(viewMode==='app'&&lsGet(LS.splash)!==today())showSplash();
   startPoem();initRole();
+  if(viewMode==='app'&&QT.active)openQT();
   try{if(sessionStorage.getItem('darb.shared')){sessionStorage.removeItem('darb.shared');setTimeout(()=>{toast('وصلت إنجازاتك لصفحة العائلة',true);confetti()},700)}}catch(e){}
   tCheck();
   let lastDay=today(),lastMin=nowMin();
-  setInterval(()=>{tCheck();tickUI();const td=today();if(td!==lastDay){lastDay=td;render();if(lsGet(LS.splash)!==td)showSplash()}else if(nowMin()!==lastMin){lastMin=nowMin();if($('#sheet').hidden&&!sw&&(ui.tab==='today'||ui.sec==='sched'))render()}},500);
+  setInterval(()=>{tCheck();tickUI();qtCheck();qtTick();const td=today();if(td!==lastDay){lastDay=td;render();if(lsGet(LS.splash)!==td)showSplash()}else if(nowMin()!==lastMin){lastMin=nowMin();if($('#sheet').hidden&&!sw&&(ui.tab==='today'||ui.sec==='sched'))render()}},500);
   initCloud();
 })();
 })();
